@@ -60,6 +60,9 @@
         $("#button_14").click(function () {
             loadJSX('FitToSelectedArt.jsx');
         });
+        $("#button_15").click(function () {
+            loadJSX('AvoidGap.jsx');
+        });
     }
     init();
 }());
