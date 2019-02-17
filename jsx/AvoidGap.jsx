@@ -3,9 +3,6 @@
 if (app.documents.length > 0) {
   var doc = app.activeDocument;
   var pthItems = doc.pathItems;
-  var totalCounter = 0;
-  var uniformFilledCounter = 0;
-  var gradientFilledCounter = 0;
   if (pthItems.length > 0) {
 /*
     var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
@@ -31,9 +28,8 @@ if (app.documents.length > 0) {
           compute(pthItems[i]);
         }
       };
-      totalCounter = uniformFilledCounter + gradientFilledCounter;
-      alert('В документе найдено ' + pthItems.length + ' контуров.' + '\nИз них обработано: ' + 'n' + '\n\nИзменено: ' + totalCounter + ' контуров.' + '\n\nИз них - ' + 'n' + ' контуров с однородной заливкой и \n' + 'n' + ' контуров с градиентной заливкой.' + '\n\nА также ' + 'n' + ' контуров с однородной обводкой и \n' + 'n' + ' контуров с градиентной обводкой.');
 
+      alert('Готово!')
   }
   else {
     alert('Контуров для обработки не найдено!');
@@ -73,6 +69,10 @@ function changeSpot_uniformFill(Color_Obj) {
   getSpotColor(Color_Obj);
   setSpotColor_uniformFill(Color_Obj);
 };
+function changeColor_gradientFill(Color_Obj) {
+  var GrdStops = getStops_gradientFill(Color_Obj);
+  setStops_gradientFill(GrdStops);
+};
 
 function getCMYKColor(Color) {
   var GetCyan, GetMagenta, GetYellow, GetBlack;
@@ -98,10 +98,8 @@ function setCMYKColor_uniformFill(Color) {
   Color.magenta = SetMagenta;
   Color.yellow = SetYellow;
   Color.black = SetBlack;
-  uniformFilledCounter
   return SetColorCMYK;
 };
-
 function getGrayColor(Color) {
   var GetGray = Color.gray;
   var GetGrayColor = new GrayColor();
@@ -115,7 +113,6 @@ function setGrayColor_uniformFill(Color) {
   Color.gray = SetGray;
   return SetGrayColor;
 };
-
 function getSpotColor(Color) {
   var GetSpot = Color.tint;
   var GetSpotColor = new SpotColor();
@@ -129,30 +126,38 @@ function setSpotColor_uniformFill(Color) {
   Color.tint = SetSpot;
   return SetSpotColor;
 };
+function defineColorStopsType() {
 
-function changeColor_gradientFill(Color_Obj) {
-	var GetGradient_Obj = Color_Obj.gradient;
+};
+
+function getStops_gradientFill(Color_Obj) {
+  var GetGradient_Obj = Color_Obj.gradient;
 	var StopGradient = GetGradient_Obj.gradientStops;
 	var CountStops = StopGradient.length;
 	var ColorStops = new Array();
-
 	for (g=0; g < CountStops; g++) {
    var ColorStop = new Object();
    var ColorStopType = StopGradient[g].color;
 	 ColorStop.type = ColorStopType.typename;
-
    switch(ColorStop.type) {
      case 'CMYKColor':
-      alert(ColorStop.type);
+        ColorStop.value = new Array;
+        ColorStop.value[0] = StopGradient[g].color.cyan;
+        ColorStop.value[1] = StopGradient[g].color.magenta;
+        ColorStop.value[2] = StopGradient[g].color.yellow;
+        ColorStop.value[3] = StopGradient[g].color.black;
      break;
      case 'GrayColor':
-      alert(ColorStop.type);
+        ColorStop.value = StopGradient[g].color.gray;
      break;
      case 'SpotColor':
-       alert(ColorStop.type);
+        ColorStop.value = StopGradient[g].color.tint;
      break;
    };
-
 	 ColorStops.push(ColorStop[g]);
  	};
+  return ColorStops;
+};
+function setStops_gradientFill() {
+  
 };

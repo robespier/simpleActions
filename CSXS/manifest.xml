@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="6.0" ExtensionBundleId="simpleActions" ExtensionBundleVersion="1.0.0" ExtensionBundleName="Simple Actions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ExtensionManifest Version="5.0" ExtensionBundleId="simpleActions" ExtensionBundleVersion="1.0.0" ExtensionBundleName="Simple Actions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
 		<Extension Id="simpleActions" Version="1.0.0" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
-            <Host Name="ILST" Version="[18.0,19.9]" />
+            <Host Name="ILST" Version="[17.0,20.0]" />
 		</HostList>
 		<LocaleList>
 			<Locale Code="All" />
 		</LocaleList>
 		<RequiredRuntimeList>
-			<RequiredRuntime Name="CSXS" Version="6.0" />
+			<RequiredRuntime Name="CSXS" Version="5.0" />
 		</RequiredRuntimeList>
 	</ExecutionEnvironment>
 	<DispatchInfoList>
