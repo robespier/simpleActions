@@ -2,9 +2,9 @@
 #target illustrator
 if (app.documents.length > 0) {
   var doc = app.activeDocument;
-  var pthItems = doc.pathItems;
-  if (pthItems.length > 0) {
-/*
+  if (doc.documentColorSpace === DocumentColorSpace.CMYK) {
+    var pthItems = doc.pathItems;
+    if (pthItems.length > 0) {
     var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
     var value = minValue.replace(/,/g, '.' );
     if (!(value === null)) {
@@ -21,18 +21,21 @@ if (app.documents.length > 0) {
             value = 3;
           };
     };
-*/
-      var value = 50; // Не забыть убрать!!!
+    deselectAll();
+
     	for(i=0; i < pthItems.length; i++) {
     		if (pthItems[i].editable) {
           compute(pthItems[i]);
         }
       };
-
       alert('Готово!')
+    }
+    else {
+      alert('Контуров для обработки не найдено!');
+    };
   }
   else {
-    alert('Контуров для обработки не найдено!');
+    alert('Недопустимый цветовой режим документа!\nУстановите CMYK Color в меню File -> Document Color Mode\nи запустите скрипт заново!');
   };
 }
 else {
@@ -44,120 +47,168 @@ else {
 ////////////////////////////////////////////////////////////////////
 
 function compute(obj) {
-	if (obj.filled) {changeColor(obj.fillColor);};
-  if (obj.stroked) {changeColor(obj.strokeColor);};
+	if (obj.filled) {
+    changeColor(obj.fillColor, obj);
+  };
+  if (obj.stroked) {
+    changeColor(obj.strokeColor, obj);
+  };
 };
-
-function changeColor(Color_Obj) {
-  switch(Color_Obj.typename) {
-    case 'CMYKColor': changeCMYK_uniformFill(Color_Obj); break;
-    case 'GrayColor': changeGray_uniformFill(Color_Obj); break;
-    case 'SpotColor': changeSpot_uniformFill(Color_Obj); break;
-    case 'GradientColor': changeColor_gradientFill(Color_Obj); break;
-   }
+function changeColor(Color, obj) {
+  switch(Color.typename) {
+    case 'CMYKColor': changeCMYK(Color); break;
+    case 'GrayColor': changeGray(Color); break;
+    case 'SpotColor': changeSpot(Color); break;
+    case 'GradientColor': changeGradient(Color, obj); break;
+  };
 };
-
-function changeCMYK_uniformFill(Color_Obj) {
-  getCMYKColor(Color_Obj);
-  setCMYKColor_uniformFill(Color_Obj);
-};
-function changeGray_uniformFill(Color_Obj) {
-  getGrayColor(Color_Obj);
-  setGrayColor_uniformFill(Color_Obj);
-};
-function changeSpot_uniformFill(Color_Obj) {
-  getSpotColor(Color_Obj);
-  setSpotColor_uniformFill(Color_Obj);
-};
-function changeColor_gradientFill(Color_Obj) {
-  var GrdStops = getStops_gradientFill(Color_Obj);
-  setStops_gradientFill(GrdStops);
-};
-
-function getCMYKColor(Color) {
-  var GetCyan, GetMagenta, GetYellow, GetBlack;
-  GetCyan = Color.cyan;
-  GetMagenta = Color.magenta;
-  GetYellow = Color.yellow;
-  GetBlack = Color.black;
-  var GetCMYKColor = new CMYKColor();
-  GetCMYKColor.cyan = GetCyan;
-  GetCMYKColor.magenta = GetMagenta;
-  GetCMYKColor.yellow = GetYellow;
-  GetCMYKColor.black = GetBlack;
-  return GetCMYKColor;
-};
-function setCMYKColor_uniformFill(Color) {
+function changeCMYK(Color) {
   var SetCyan, SetMagenta, SetYellow, SetBlack;
   if (Color.cyan < value) {SetCyan = 0;} else {SetCyan = Color.cyan};
   if (Color.magenta < value) {SetMagenta = 0;} else {SetMagenta = Color.magenta};
-  if (Color.yellow < value) {SetYellow = 0;} else {SetYellow =   Color.yellow};
+  if (Color.yellow < value) {SetYellow = 0;} else {SetYellow = Color.yellow};
   if (Color.black < value) {SetBlack = 0;} else {SetBlack = Color.black};
-  var SetColorCMYK = new CMYKColor();
-  Color.cyan = SetCyan;
-  Color.magenta = SetMagenta;
-  Color.yellow = SetYellow;
-  Color.black = SetBlack;
-  return SetColorCMYK;
+  Color.cyan = SetCyan; Color.magenta = SetMagenta; Color.yellow = SetYellow; Color.black = SetBlack;
 };
-function getGrayColor(Color) {
-  var GetGray = Color.gray;
-  var GetGrayColor = new GrayColor();
-  GetGrayColor.gray = GetGray;
-  return GetGrayColor;
-};
-function setGrayColor_uniformFill(Color) {
+function changeGray(Color) {
   var SetGray;
   if (Color.gray < value) {SetGray = 0;} else {SetGray = Color.gray;};
-  var SetGrayColor = new GrayColor();
   Color.gray = SetGray;
-  return SetGrayColor;
 };
-function getSpotColor(Color) {
-  var GetSpot = Color.tint;
-  var GetSpotColor = new SpotColor();
-  GetSpotColor.tint = GetSpot;
-  return GetSpotColor;
-};
-function setSpotColor_uniformFill(Color) {
+function changeSpot(Color) {
   var SetSpot;
   if (Color.tint < value) {SetSpot = 0;} else {SetSpot = Color.tint;};
-  var SetSpotColor = new SpotColor();
   Color.tint = SetSpot;
-  return SetSpotColor;
 };
-function defineColorStopsType() {
-
+function changeGradient(Color, obj) {
+  var NewColor = convertAllColorStopsToCmyk(Color, obj);
+  setGradientColor(NewColor);
 };
 
-function getStops_gradientFill(Color_Obj) {
-  var GetGradient_Obj = Color_Obj.gradient;
-	var StopGradient = GetGradient_Obj.gradientStops;
+function convertAllColorStopsToCmyk(Color, obj) {
+  obj.selected = true;
+  var UpdateGradientColor = new GradientColor();
+  var GetGradient = Color.gradient;
+	var StopGradient = GetGradient.gradientStops;
 	var CountStops = StopGradient.length;
-	var ColorStops = new Array();
 	for (g=0; g < CountStops; g++) {
-   var ColorStop = new Object();
-   var ColorStopType = StopGradient[g].color;
-	 ColorStop.type = ColorStopType.typename;
-   switch(ColorStop.type) {
-     case 'CMYKColor':
-        ColorStop.value = new Array;
-        ColorStop.value[0] = StopGradient[g].color.cyan;
-        ColorStop.value[1] = StopGradient[g].color.magenta;
-        ColorStop.value[2] = StopGradient[g].color.yellow;
-        ColorStop.value[3] = StopGradient[g].color.black;
-     break;
-     case 'GrayColor':
-        ColorStop.value = StopGradient[g].color.gray;
+    var newColor = new CMYKColor();
+    switch(StopGradient[g].color.typename) {
+      case 'CMYKColor':
+        UpdateGradientColor = Color;
+      break;
+      case 'GrayColor':
+        newColor.cyan = 0;
+        newColor.magenta = 0;
+        newColor.yellow = 0;
+        newColor.black = StopGradient[g].color.gray;
+        StopGradient[g].color = newColor;
+        var UpdateGradient = obj.fillColor;
+        var SetUpdateGradient = UpdateGradient.gradient;
+        var StopUpdateGradient = SetUpdateGradient.gradientStops;
+        StopUpdateGradient[g].color = newColor;
+        UpdateGradientColor = UpdateGradient;
      break;
      case 'SpotColor':
-        ColorStop.value = StopGradient[g].color.tint;
+        app.doScript('Convert to CMYK', 'My Actions');
+        newColor.cyan = obj.fillColor.gradient.gradientStops[g].color.cyan;
+        newColor.magenta = obj.fillColor.gradient.gradientStops[g].color.magenta;
+        newColor.yellow = obj.fillColor.gradient.gradientStops[g].color.yellow;
+        newColor.black = obj.fillColor.gradient.gradientStops[g].color.black;
+        StopGradient[g].color = newColor;
+        var UpdateGradient = obj.fillColor;
+        var SetUpdateGradient = UpdateGradient.gradient;
+        var StopUpdateGradient = SetUpdateGradient.gradientStops;
+        StopUpdateGradient[g].color = newColor;
+        UpdateGradientColor = UpdateGradient;
      break;
-   };
-	 ColorStops.push(ColorStop[g]);
+    };
  	};
-  return ColorStops;
+  obj.selected = false;
+  return UpdateGradientColor;
 };
-function setStops_gradientFill() {
-  
+
+function setGradientColor(NewColor) {
+  var SetGradientColor = new GradientColor();
+  var SetGradient = NewColor.gradient;
+  var StopGradient = SetGradient.gradientStops;
+  var CountStops = StopGradient.length;
+  var NewColorStop = new CMYKColor();
+
+  var CyanValue = new Array();
+  var MagentaValue = new Array();
+  var YellowValue = new Array();
+  var BlackValue = new Array();
+  for (a=0; a < CountStops; a++) {
+    CyanValue.push(StopGradient[a].color.cyan);
+    MagentaValue.push(StopGradient[a].color.magenta);
+    YellowValue.push(StopGradient[a].color.yellow);
+    BlackValue.push(StopGradient[a].color.black);
+  };
+
+  var sortArray = CyanValue.sort(compareNumeric);
+  var maxValue = sortArray[CyanValue.length - 1];
+    if (maxValue >= value) {
+      for (s=0; s < CountStops; s++) {
+        if (StopGradient[s].color.cyan < value) {StopGradient[s].color.cyan = value};
+      };
+    };
+    if (maxValue < value) {
+      for (s=0; s < CountStops; s++) {
+        StopGradient[s].color.cyan = 0;
+      };
+    };
+
+  var sortArray = MagentaValue.sort(compareNumeric);
+  var maxValue = sortArray[MagentaValue.length - 1];
+    if (maxValue >= value) {
+      for (s=0; s < CountStops; s++) {
+        if (StopGradient[s].color.magenta < value) {StopGradient[s].color.magenta = value};
+      };
+    };
+    if (maxValue < value) {
+      for (s=0; s < CountStops; s++) {
+        StopGradient[s].color.magenta = 0;
+      };
+    };
+
+    var sortArray = YellowValue.sort(compareNumeric);
+    var maxValue = sortArray[YellowValue.length - 1];
+      if (maxValue >= value) {
+        for (s=0; s < CountStops; s++) {
+          if (StopGradient[s].color.yellow < value) {StopGradient[s].color.yellow = value};
+        };
+      };
+      if (maxValue < value) {
+        for (s=0; s < CountStops; s++) {
+          StopGradient[s].color.yellow = 0;
+        };
+      };
+
+      var sortArray = BlackValue.sort(compareNumeric);
+      var maxValue = sortArray[BlackValue.length - 1];
+        if (maxValue >= value) {
+          for (s=0; s < CountStops; s++) {
+            if (StopGradient[s].color.black < value) {StopGradient[s].color.black = value};
+          };
+        };
+        if (maxValue < value) {
+          for (s=0; s < CountStops; s++) {
+            StopGradient[s].color.black = 0;
+          };
+        };
+
+};
+
+function deselectAll() {
+  var doc = app.activeDocument;
+  var docSelected = doc.selection;
+  for (var i=0; i < docSelected.length; i++) {
+      docSelected[i].selected = false;
+  };
+};
+
+function compareNumeric(a, b) {
+  if (a > b) return 1;
+  if (a < b) return -1;
 };
