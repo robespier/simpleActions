@@ -22,7 +22,6 @@ if (app.documents.length > 0) {
           };
     };
     deselectAll();
-
     	for(i=0; i < pthItems.length; i++) {
     		if (pthItems[i].editable) {
           compute(pthItems[i]);
@@ -49,9 +48,6 @@ else {
 function compute(obj) {
 	if (obj.filled) {
     changeColor(obj.fillColor, obj);
-  };
-  if (obj.stroked) {
-    changeColor(obj.strokeColor, obj);
   };
 };
 function changeColor(Color, obj) {
@@ -81,59 +77,51 @@ function changeSpot(Color) {
   Color.tint = SetSpot;
 };
 function changeGradient(Color, obj) {
-  var NewColor = convertAllColorStopsToCmyk(Color, obj);
+  var NewColor = convertToCmyk(Color, obj);
   setGradientColor(NewColor);
 };
 
-function convertAllColorStopsToCmyk(Color, obj) {
-  obj.selected = true;
-  var UpdateGradientColor = new GradientColor();
-  var GetGradient = Color.gradient;
-	var StopGradient = GetGradient.gradientStops;
-	var CountStops = StopGradient.length;
-	for (g=0; g < CountStops; g++) {
-    var newColor = new CMYKColor();
-    switch(StopGradient[g].color.typename) {
-      case 'CMYKColor':
-        UpdateGradientColor = Color;
-      break;
-      case 'GrayColor':
-        newColor.cyan = 0;
-        newColor.magenta = 0;
-        newColor.yellow = 0;
-        newColor.black = StopGradient[g].color.gray;
-        StopGradient[g].color = newColor;
-        var UpdateGradient = obj.fillColor;
-        var SetUpdateGradient = UpdateGradient.gradient;
-        var StopUpdateGradient = SetUpdateGradient.gradientStops;
-        StopUpdateGradient[g].color = newColor;
-        UpdateGradientColor = UpdateGradient;
-     break;
-     case 'SpotColor':
-        app.doScript('Convert to CMYK', 'My Actions');
-        newColor.cyan = obj.fillColor.gradient.gradientStops[g].color.cyan;
-        newColor.magenta = obj.fillColor.gradient.gradientStops[g].color.magenta;
-        newColor.yellow = obj.fillColor.gradient.gradientStops[g].color.yellow;
-        newColor.black = obj.fillColor.gradient.gradientStops[g].color.black;
-        StopGradient[g].color = newColor;
-        var UpdateGradient = obj.fillColor;
-        var SetUpdateGradient = UpdateGradient.gradient;
-        var StopUpdateGradient = SetUpdateGradient.gradientStops;
-        StopUpdateGradient[g].color = newColor;
-        UpdateGradientColor = UpdateGradient;
-     break;
-    };
- 	};
-  obj.selected = false;
-  return UpdateGradientColor;
-};
+function convertToCmyk(Color, obj) {
+    var NewGradientColor = new GradientColor();
+    var GetGradient = Color.gradient;
+  	var StopGradient = GetGradient.gradientStops;
+  	var CountStops = StopGradient.length;
+  	for (g=0; g < CountStops; g++) {
+        var newColor = new CMYKColor();
+        switch(StopGradient[g].color.typename) {
+          case 'CMYKColor':
+            NewGradientColor.gradient = GetGradient;
+            NewGradientColor.gradient.gradientStops = StopGradient;
+            NewGradientColor.gradient.gradientStops[g].color = StopGradient[g].color;
+          break;
+          case 'GrayColor':
+            newColor.cyan = 0;
+            newColor.magenta = 0;
+            newColor.yellow = 0;
+            newColor.black = StopGradient[g].color.gray;
+            StopGradient[g].color = newColor;
+            NewGradientColor.gradient = GetGradient;
+            NewGradientColor.gradient.gradientStops = StopGradient;
+            NewGradientColor.gradient.gradientStops[g].color = StopGradient[g].color;
+          break;
+          case 'SpotColor':
+            obj.selected = true;
+            app.doScript('Convert to CMYK', 'My Actions');
+            var sel = app.activeDocument.selection;
+            var selColor = sel[0].fillColor;
+            NewGradientColor.gradient = selColor.gradient;
+            NewGradientColor.gradient.gradientStops = selColor.gradient.gradientStops;
+            NewGradientColor.gradient.gradientStops[g].color = selColor.gradient.gradientStops[g].color;
+            obj.selected = false;
+          break;
+       };
+   };
+   return NewGradientColor;
+ };
 
 function setGradientColor(NewColor) {
-  var SetGradientColor = new GradientColor();
-  var SetGradient = NewColor.gradient;
-  var StopGradient = SetGradient.gradientStops;
+  var StopGradient = NewColor.gradient.gradientStops;
   var CountStops = StopGradient.length;
-  var NewColorStop = new CMYKColor();
 
   var CyanValue = new Array();
   var MagentaValue = new Array();
