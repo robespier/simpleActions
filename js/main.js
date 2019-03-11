@@ -30,6 +30,9 @@
         $("#button_3_1").click(function () {
             loadJSX('updateBlank.jsx');
         });
+        $("#button_3_2").click(function () {
+            loadJSX('exportBlank.jsx');
+        });
         $("#button_4").click(function () {
             loadJSX('duplicateSelectedLayers.jsx');
         });
@@ -62,6 +65,9 @@
         });
         $("#button_15").click(function () {
             loadJSX('AvoidGap.jsx');
+        });
+        $("#button_16").click(function () {
+            loadJSX('openReadmeFile.jsx');
         });
     }
     init();
