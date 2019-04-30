@@ -5,29 +5,30 @@ if (app.documents.length > 0) {
   if (doc.documentColorSpace === DocumentColorSpace.CMYK) {
     var pthItems = doc.pathItems;
     if (pthItems.length > 0) {
-    var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
-    var value = minValue.replace(/,/g, '.' );
-    if (!(value === null)) {
-      if (!isNaN(value)) {
-        value = Math.round(value);
-        if (value < 2) {
-          value = 3;
-        }
-        else if (value > 5) {
-          value = 3;
-        };
+      app.executeMenuCommand('unlockAll');
+      deselectAll();
+      var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
+      var value = minValue.replace(/,/g, '.' );
+      if (!(value === null)) {
+        if (!isNaN(value)) {
+          value = Math.round(value);
+          if (value < 2) {
+            value = 3;
           }
-          else {
+          else if (value > 5) {
             value = 3;
           };
-    };
-    deselectAll();
-    	for(i=0; i < pthItems.length; i++) {
-    		if (pthItems[i].editable) {
-          compute(pthItems[i]);
-        }
+            }
+            else {
+              value = 3;
+            };
       };
-      alert('Готово!')
+      	for(i=0; i < pthItems.length; i++) {
+      		if (pthItems[i].editable) {
+            compute(pthItems[i]);
+          }
+        };
+        alert('Готово!')
     }
     else {
       alert('Контуров для обработки не найдено!');
