@@ -109,7 +109,7 @@ function convertToCmyk(Color, obj) {
           break;
           case 'SpotColor':
             obj.selected = true;
-            app.doScript('Convert to CMYK', 'My Actions');
+            app.executeMenuCommand('Colors8');
             var sel = app.activeDocument.selection;
             var selColor = sel[0].fillColor;
             NewGradientColor.gradient = selColor.gradient;
