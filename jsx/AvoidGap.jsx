@@ -49,6 +49,9 @@ function compute(obj) {
 	if (obj.filled) {
     changeColor(obj.fillColor, obj);
   };
+	if (obj.stroked) {
+    changeColor(obj.strokeColor, obj);
+  };
 };
 function changeColor(Color, obj) {
   switch(Color.typename) {
