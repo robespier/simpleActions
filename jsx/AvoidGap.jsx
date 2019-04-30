@@ -6,7 +6,7 @@ if (app.documents.length > 0) {
     var pthItems = doc.pathItems;
     if (pthItems.length > 0) {
       app.executeMenuCommand('unlockAll');
-      deselectAll();
+      app.executeMenuCommand('deselectall');
       var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
       var value = minValue.replace(/,/g, '.' );
       if (!(value === null)) {
@@ -190,14 +190,6 @@ function setGradientColor(NewColor) {
           };
         };
 
-};
-
-function deselectAll() {
-  var doc = app.activeDocument;
-  var docSelected = doc.selection;
-  for (var i=0; i < docSelected.length; i++) {
-      docSelected[i].selected = false;
-  };
 };
 
 function compareNumeric(a, b) {
