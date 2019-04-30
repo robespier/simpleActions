@@ -5,8 +5,6 @@ if (app.documents.length > 0) {
   if (doc.documentColorSpace === DocumentColorSpace.CMYK) {
     var pthItems = doc.pathItems;
     if (pthItems.length > 0) {
-      app.executeMenuCommand('unlockAll');
-      app.executeMenuCommand('deselectall');
       var minValue = prompt('Введите значение минимально допустимой точки в процентах в интервале от 2 до 5.\n\nДробные числа будут округлены до ближайших целых.', '3', 'Avoid Gap in Vector Objects');
       var value = minValue.replace(/,/g, '.' );
       if (!(value === null)) {
@@ -23,12 +21,24 @@ if (app.documents.length > 0) {
               value = 3;
             };
       };
-      	for(i=0; i < pthItems.length; i++) {
+        app.executeMenuCommand('unlockAll');
+        var unlockedObjects = new Array();
+        var docSelected = doc.selection;
+        for (var i=0; i < docSelected.length; i++) {
+          unlockedObjects.push(docSelected[i]);
+        };
+        app.executeMenuCommand('deselectall');
+
+      	for (var i=0; i < pthItems.length; i++) {
       		if (pthItems[i].editable) {
             compute(pthItems[i]);
           }
         };
-        alert('Готово!')
+        for (var i=0; i < unlockedObjects.length; i++) {
+          unlockedObjects[i].locked = true;
+        };
+        alert('Готово!');
+        app.redraw();
     }
     else {
       alert('Контуров для обработки не найдено!');
@@ -92,7 +102,7 @@ function convertToCmyk(Color, obj) {
   	var CountStops = StopGradient.length;
   	for (g=0; g < CountStops; g++) {
         var newColor = new CMYKColor();
-        switch(StopGradient[g].color.typename) {
+        switch (StopGradient[g].color.typename) {
           case 'CMYKColor':
             NewGradientColor.gradient = GetGradient;
             NewGradientColor.gradient.gradientStops = StopGradient;
