@@ -102,7 +102,7 @@ function greateOffsetPath(path) {
       targetPath.applyEffect(xmlstring); // Применяем эффект Offset Path для контура
       deselectAll(); // Убираем выделение в активном документе
       targetPath.selected = true; // Выделяем целевой контур
-      app.doScript('Expand Appearance', 'My Actions'); // Expand Appearance для эффекта Offset Path
+      app.executeMenuCommand('expandStyle'); // Expand Appearance для эффекта Offset Path
     };
   return targetPath;
 };
