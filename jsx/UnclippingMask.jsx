@@ -1,21 +1,31 @@
-﻿// Unclipping Mask version 1.0.0 created: december 2018 author: Roman Sergeev
 #target illustrator
-#include "functions.jsx";
 if (app.documents.length > 0) {
   var doc = app.activeDocument;
-  var docSelected = doc.selection;
-  if (docSelected.length > 0) {
-    if (docSelected[0].typename === 'GroupItem' && docSelected[0].clipped === true) {
-      var clipGroup = docSelected[0].pageItems.length;
-      var clipPath;
+  var sel = doc.selection;
+  if (sel.length > 0) {
+    if (sel[0].typename == 'GroupItem' && sel[0].clipped == true) {
+      var clipPath = null;
+      var clipGroup = sel[0].pageItems.length;
       for (var i = 0; i < clipGroup; i++) {
-        if (docSelected[0].pageItems[i].typename === 'PathItem' && docSelected[0].pageItems[i].clipping === true) {
-          clipPath = docSelected[0].pageItems[i];
+        if (sel[0].pageItems[i].typename == 'PathItem' && sel[0].pageItems[i].clipping == true) {
+          clipPath = sel[0].pageItems[i];
+          };
+        };
+      if (clipPath == null) {
+        for (var i = 0; i < clipGroup; i++) {
+          if (sel[0].pageItems[i].typename == 'CompoundPathItem' && sel[0].pageItems[i].pathItems[0].clipping == true) {
+            clipPath = sel[0].pageItems[i];
+          }
+          };
+      };
+      if (clipPath == null) {
+        for (var i = 0; i < clipGroup; i++) {
+          if (sel[0].pageItems[i].typename == 'PluginItem') {
+            clipPath = sel[0].pageItems[i];
+          }
         };
       };
-      clipPath.moveToBeginning(docSelected[0]);
-      docSelected[0].clipped = false;
-      app.executeMenuCommand('ungroup');
+      app.executeMenuCommand('releaseMask');
       clipPath.remove();
     }
     else {
