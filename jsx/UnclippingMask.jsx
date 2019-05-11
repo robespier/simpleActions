@@ -9,8 +9,8 @@ if (app.documents.length > 0) {
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'PathItem' && sel[0].pageItems[i].clipping == true) {
             clipPath = sel[0].pageItems[i];
-            };
           };
+        };
       if (clipPath == null) {
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'CompoundPathItem' && sel[0].pageItems[i].pathItems[0].clipping == true) {
