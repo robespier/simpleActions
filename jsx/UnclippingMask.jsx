@@ -9,9 +9,9 @@ if (app.documents.length > 0) {
   var doc = app.activeDocument;
   var sel = doc.selection;
   var clipPath = null;
+  var clipGroup = sel[0].pageItems.length;
   if (sel.length > 0) {
     if (sel[0].typename == 'GroupItem' && sel[0].clipped == true) {
-      var clipGroup = sel[0].pageItems.length;
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'PathItem' && sel[0].pageItems[i].clipping == true) {
             clipPath = sel[0].pageItems[i];
@@ -19,7 +19,6 @@ if (app.documents.length > 0) {
           };
         };
       if (clipPath == null) {
-        var clipGroup = sel[0].pageItems.length;
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'CompoundPathItem' && sel[0].pageItems[i].pathItems[0].clipping == true) {
             clipPath = sel[0].pageItems[i];
@@ -28,7 +27,6 @@ if (app.documents.length > 0) {
         };
       };
       if (clipPath == null) {
-        var clipGroup = sel[0].pageItems.length;
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'PluginItem') {
             sel[0].pageItems[i].remove();
@@ -45,7 +43,6 @@ if (app.documents.length > 0) {
         };
       };
       if (clipPath == null) {
-        var clipGroup = sel[0].pageItems.length;
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'TextFrame' && sel[0].pageItems[i].kind == 'TextType.POINTTEXT') {
             sel[0].pageItems[i].convertPointObjectToAreaObject();
@@ -62,7 +59,6 @@ if (app.documents.length > 0) {
         };
       };
       if (clipPath == null) {
-        var clipGroup = sel[0].pageItems.length;
         for (var i = 0; i < clipGroup; i++) {
           if (sel[0].pageItems[i].typename == 'TextFrame' && sel[0].pageItems[i].kind == 'TextType.PATHTEXT') {
             sel[0].pageItems[i].convertPointObjectToAreaObject();
